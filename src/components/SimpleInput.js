@@ -1,20 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const SimpleInput = (props) => {
   const [enteredName, setEnteredName] = useState('');
-  const [enterenNameIsValid, setEnteredNameIsValid] = useState(true);
   const [enteredTouched, setEnteredTouched] = useState(false);
+  const [formIsValid, setFormIsValid] = useState(false);
+
+  const enteredNameIsValid = enteredName.trim() !== '';
+  const nameInputIsInvalid = !enteredNameIsValid && enteredTouched;
+
+  useEffect(() => {
+    if (enteredNameIsValid) {
+      setFormIsValid(true);
+    } else {
+      setFormIsValid(false);
+    }
+  }, [enteredNameIsValid]);
+
   const nameInputChangeNudler = (e) => {
     setEnteredName(e.target.value);
   };
 
   const nameInputBlurHandler = (e) => {
     setEnteredTouched(true);
-
-    if (enteredName.trim() === '') {
-      setEnteredNameIsValid(false);
-      return;
-    }
   };
 
   const formSumbitNudler = (e) => {
@@ -22,16 +29,15 @@ const SimpleInput = (props) => {
 
     setEnteredTouched(true);
 
-    if (enteredName.trim() === '') {
-      setEnteredNameIsValid(false);
+    if (!enteredNameIsValid) {
       return;
     }
-    setEnteredNameIsValid(true);
+
+    setEnteredName('');
 
     console.log(enteredName);
+    setEnteredTouched(false);
   };
-
-  const nameInputIsInvalid = !enterenNameIsValid && enteredTouched;
 
   const nameInputClasses = nameInputIsInvalid
     ? 'form-control error-text'
@@ -49,7 +55,7 @@ const SimpleInput = (props) => {
         {nameInputIsInvalid && <p>Name must not be empty</p>}
       </div>
       <div className="form-actions">
-        <button>Submit</button>
+        <button disabled={!formIsValid}>Submit</button>
       </div>
     </form>
   );
